@@ -2,4 +2,4 @@
 Pytorch Implementations for Probabilistic Machine Learning book by Murphy
 
 
-[Gaussian Mixture Model with Expectation Maximization -- GMM EM](src/pml/gmm_em.py)
+[11.4.2 EM for GMMs](src/pml/gmm_em.py)
