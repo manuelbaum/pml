@@ -1,4 +1,4 @@
-# pml
+# Probabilist Machine Learning in PyTorch
 Pytorch Implementations for Probabilistic Machine Learning book by Murphy
 
 
