@@ -12,6 +12,9 @@ pip install .
 # Implementations
 
 [11.4.2 EM for GMMs](src/pml/gmm_em.py)
+
 [17.4.2 Forwards Algorithm for HMMs with Gaussian likelihood](src/pml/hmm_gaussian.py)
+
 [17.4.3 Forwards-Backwards Algorithm for HMMs with Gaussian likelihood](src/pml/hmm_gaussian.py)
+
 [17.5.2 EM for HMMs with Gaussian likelihood](src/pml/hmm_gaussian.py)
