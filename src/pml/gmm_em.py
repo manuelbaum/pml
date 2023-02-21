@@ -52,6 +52,7 @@ def compute_gmm_likelihood(xs, mu, Sigma):
         mahalanobis = torch.einsum("bi,ij,bj->b",nu,torch.inverse(Sigma[i_component]),nu)
         likelihood[:, i_component] = torch.det(S) ** -.5 * torch.exp(-.5 * mahalanobis)
     return likelihood
+
 def gmm_em(xs, n_components, n_epochs = 100):
     '''
     This function fits a Gaussian Mixture Model to the input data. The implementation is not fully parallelized, it loops
@@ -85,7 +86,7 @@ def gmm_em(xs, n_components, n_epochs = 100):
 
         ### expect: compute new responsibilty of components for data points, given fixed parameters for distributions
         likelihood = compute_gmm_likelihood(xs, mu, Sigma)
-        r = pi.unsqueeze(0) * likelihood # r is the responsibility of compoents for data-points
+        r = pi.unsqueeze(0) * likelihood # r is the responsibility of components for data-points
         r /= r.sum(dim=1).unsqueeze(1)
         r_marginal = torch.sum(r, dim=0)
 
