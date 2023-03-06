@@ -10,6 +10,7 @@ Page 352, Chapter 11.4.2 EM for GMMs
 def create_gmm_data() -> torch.Tensor:
     '''
     Creates 2d training data for a gaussian mixture model by sampling from 3 different gaussian components
+
     Returns:
         torch.Tensor: A tensor of size n_data x 2
     '''
@@ -35,6 +36,7 @@ def create_gmm_data() -> torch.Tensor:
 def compute_gmm_likelihood(xs, mu, Sigma):
     """
     Computes the likelihood that a batch of input data was generated from one out of several gaussian components
+
     Args:
         xs (torch.Tensor): input data of shape n_data x dim_data
         mu (torch.Tensor): means of the components, shape n_components x dim_data
@@ -55,9 +57,11 @@ def compute_gmm_likelihood(xs, mu, Sigma):
 
 def gmm_em(xs, n_components, n_epochs = 100):
     '''
-    This function fits a Gaussian Mixture Model to the input data. The implementation is not fully parallelized, it loops
-    over the components in several places. This would be rather easy to optimize in the future and for me the trade-off
-    is not worth it right now.
+    Fits a Gaussian Mixture Model to the input data.
+
+    The implementation is not fully parallelized, it loops over the components in several places. This would be rather
+    easy to optimize in the future and for me the trade-off is not worth it right now.
+
     Args:
         xs (torch.Tensor): the input data, shape n_data x dim_data
         n_components (int): the number of hidden components

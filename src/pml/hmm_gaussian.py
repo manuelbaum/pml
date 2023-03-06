@@ -14,15 +14,27 @@ Notation deviates from those pages, but is chosen to align better with other pag
 # Sigma -- the covariances of observation per component
 '''
 
-def create_hmm_data(pi, A, B, R):
+def create_hmm_data(pi, A, B, R, T=120):
+    """
+    Creates training data that we use for testing the below implementations.
+    Args:
+        pi (torch.Tensor): the prior probability to be in a discrete state
+        A (torch.Tensor): the probabilistic state transition matrix, rows should sum up to one
+        B (torch.Tensor): the mean observations per state, shape n_states x dim_observation
+        R (torch.Tensor): the covariance matrices per state, shape n_states x dim_observation x dim_observation
+        T (int): the number of time-steps to simulate
+    Returns:
+        a tuple (zs, ss):
+        zs (torch.Tensor): The observations sampled from the HMM, shape T x dim_observation
+        ss (torch.Tensor): The hidden states sampled from the HMM, shape T
+    """
     # create input data
-    T = 120  # number of time-steps
     ss = torch.zeros(T, dtype=torch.long)  # trajectory of discrete states
     zs = torch.zeros(T, dim_observation)  # trajectory of observations
 
     # sample for t=0 (special case, no previous time-step)
     categorical = torch.distributions.Categorical(pi)
-    s = categorical.sample()
+    ss[0] = categorical.sample()
     for t in range(1, T):
         # sample the discrete component
         categorical = torch.distributions.Categorical(A[ss[t - 1]])
@@ -35,6 +47,15 @@ def create_hmm_data(pi, A, B, R):
     return zs, ss
 
 def predict_hmm(p, A):
+    """
+    Executes a single step of the forward algorithm for HMM.
+    Args:
+        p (torch.Tensor): the discrete prior probability
+        A (torch.Tensor): the probabilistic state transition matrix, rows should sum up to one
+
+    Returns:
+
+    """
     p_bar = A.mv(p)
     p_bar = p_bar / torch.sum(p_bar)
     return p_bar
@@ -100,10 +121,6 @@ def em_hmm(zs, K, n_iter=10, initialization="gmm"):
     elif initialization == "gmm":
         B, R = gmm_em(zs, K, n_epochs=100) # @todo get pi out of this
 
-        print("GMM initialized B and R")
-        print(B)
-        print(R)
-
         A = torch.normal(torch.zeros(K,K), torch.ones(K,K)) # state transition matrix
         pi = torch.tensor([.5, .5])
 
@@ -133,7 +150,12 @@ def em_hmm(zs, K, n_iter=10, initialization="gmm"):
     return pi, A, B, R
 
 if __name__ == "__main__":
+    torch.set_printoptions(precision=2)
+
+    # potentially set a fixed seed if you want to analyse the code
     #torch.manual_seed(1)
+
+    # define the ground truth HMM
     dim_observation = 2
     pi = torch.tensor([.5, .5])
     A = torch.tensor([[.9, .1],
@@ -146,10 +168,12 @@ if __name__ == "__main__":
                       [[1., 0.],
                        [0., 1.]]])
 
+    # create training data
     zs, ss = create_hmm_data(pi, A, B, R)
     print("ground truth states:", ss)
     T = zs.size()[0]
-    # inference with known model
+
+    # inference with known model, to see if our implementations of inference work before we move on to learning
     ps = torch.zeros(T,2)
     p = pi
     for i in range(0,T):
@@ -157,14 +181,13 @@ if __name__ == "__main__":
         ps[i] = p
         p = predict_hmm(p, A)
 
-
-    torch.set_printoptions(precision=2)
     print("state predictions forward:", ps[:,1].round().int())
     # print("forward:", ps[:,1])
     ps = forward_backward_hmm(pi, zs, A, B, R)
     print("state predictions forback:", ps[:,1].round().int())
 
 
+    # Learn a new HMM from the training data. There are different ways to initialize it
     # pi, A, B, R = em_hmm(zs, K=2, n_iter=30, initialization=(pi, A, B, R))
     # pi, A, B, R = em_hmm(zs, K=2, n_iter=30, initialization="random")
     pi_emm, A_emm, B_emm, R_emm = em_hmm(zs, K=2, n_iter=30, initialization="gmm")
