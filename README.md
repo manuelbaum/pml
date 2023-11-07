@@ -1,4 +1,4 @@
-# Probabilist Machine Learning in PyTorch
+# Probabilistic Machine Learning in PyTorch
 Pytorch Implementations for Probabilistic Machine Learning book by Kevin Murphy.
 
 The implementations in here are in some way a trade-off between readability, execution speed and me trying to get stuff
